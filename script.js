@@ -44,7 +44,7 @@ function displayTodos() {
                 <div class="task-date-display"><i class="fas fa-calendar-alt"></i> ${formatedDate}</div>
             </div>
             <div class="task-actions">
-<!--                <button class="btn edit"><i class="fas fa-pen"></i></button>-->
+                <button class="btn edit" onclick="showEditForm(${index})"><i class="fas fa-pen"></i></button>
                 <button class="btn delete" onclick="deleteTask(${index})"><i class="fas fa-trash"></i></button>
             </div>
         </div>
@@ -53,10 +53,52 @@ function displayTodos() {
 }
 
 function deleteTask(index) {
-    if (confirm('Are You Sure To Delete This Task?')){
+    if (confirm('Are You Sure To Delete This Task?')) {
         todoList.splice(index, 1);
         localStorage.setItem('todoList', JSON.stringify(todoList));
         displayTodos();
     }
 }
 
+function showEditForm(index) {
+    let storedTodo = JSON.parse(localStorage.getItem('todoList')) || [];
+    let currentTodo = storedTodo[index];
+    let taskTitleInput = document.querySelector('#taskTitleEdit')
+    let taskDateInput = document.querySelector('#taskDateEdit');
+    let taskIndex = document.querySelector('#taskIndex');
+    taskTitleInput.value = currentTodo.taskTitle;
+    taskDateInput.value = currentTodo.taskDate;
+    taskIndex.value = index;
+    openModal();
+}
+
+function updateTodo() {
+    let taskTitleInput = document.querySelector('#taskTitleEdit')
+    let taskDateInput = document.querySelector('#taskDateEdit');
+    let taskIndex = document.querySelector('#taskIndex');
+    let index = Number(taskIndex.value);
+    if (taskTitleInput.value === null || taskDateInput.value === null || taskTitleInput.value === undefined || taskDateInput.value === undefined || taskTitleInput.value === '' || taskDateInput.value === '') {
+        alert('Please enter both task and date.');
+        return;
+    }
+    if (taskTitleInput.value.length > 255) {
+        alert('Task title is too long. Please limit it to 255 characters.');
+        return;
+    }
+    let storedTodo = JSON.parse(localStorage.getItem('todoList')) || [];
+    storedTodo[index].taskTitle = taskTitleInput.value.trim();
+    storedTodo[index].taskDate = taskDateInput.value;
+    localStorage.setItem('todoList', JSON.stringify(storedTodo));
+    closeModal();
+    displayTodos();
+}
+
+
+
+
+function openModal() {
+    document.getElementById('editModal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
